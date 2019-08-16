@@ -1,1 +1,2 @@
 metric_name,metric_type,interval,unit_name,per_unit_name,description,orientation,integration,short_name
+druid.process.health,gauge,,,,"1 if the service is healthy, 0 otherwise",0,druid,health

@@ -6,37 +6,60 @@ import pytest
 from datadog_checks.base import AgentCheck
 from datadog_checks.druid import DruidCheck
 
-from .common import BROKER_URL
+from .common import BROKER_URL, COORDINATOR_URL
 
-INSTANCE = {'url': BROKER_URL, 'tags': ['my:instance-tag']}
-
-CONFIG = {'instances': INSTANCE, 'tags': ['my:init-tag']}
+CONFIG = {
+    'instances': [
+        {'url': BROKER_URL, 'tags': ['my:broker-instance-tag']},
+        {'url': COORDINATOR_URL, 'tags': ['my:coordinator-instance-tag']},
+    ],
+    'tags': ['my:init-tag']
+}
 
 
 @pytest.mark.integration
 @pytest.mark.usefixtures('dd_environment')
 def test_service_checks_integration(aggregator):
-
-    check = DruidCheck('druid', CONFIG, [INSTANCE])
-    check.check(INSTANCE)
+    for _ in range(3):
+        for instance in CONFIG['instances']:
+            check = DruidCheck('druid', CONFIG, [instance])
+            check.check(instance)
 
     assert_service_checks(aggregator)
 
 
 @pytest.mark.e2e
 def test_service_checks_e2e(dd_agent_check):
-    aggregator = dd_agent_check(CONFIG)
+    aggregator = dd_agent_check(CONFIG, times=3)
 
     assert_service_checks(aggregator)
 
 
 def assert_service_checks(aggregator):
     aggregator.assert_service_check(
-        'druid.process.can_connect', AgentCheck.OK, ['url:http://localhost:8082/status/properties', 'my:instance-tag']
+        'druid.process.can_connect', AgentCheck.OK,
+        tags=['url:http://localhost:8082/status/properties', 'my:broker-instance-tag'],
+        count=3
     )
+
+    aggregator.assert_service_check(
+        'druid.process.can_connect', AgentCheck.OK,
+        tags=['url:http://localhost:8081/status/properties', 'my:coordinator-instance-tag'],
+        count=3
+    )
+
     aggregator.assert_service_check(
         'druid.process.health',
         AgentCheck.OK,
-        ['url:http://localhost:8082/status/health', 'my:instance-tag', 'service:druid/broker'],
+        tags=['url:http://localhost:8082/status/health', 'my:broker-instance-tag', 'service:druid/broker'],
+        count=3
     )
+
+    aggregator.assert_service_check(
+        'druid.process.health',
+        AgentCheck.OK,
+        tags=['url:http://localhost:8081/status/health', 'my:coordinator-instance-tag', 'service:druid/coordinator'],
+        count=3
+    )
+
     aggregator.assert_all_metrics_covered()

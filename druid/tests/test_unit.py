@@ -36,10 +36,7 @@ def test_service_check_can_connect_success(aggregator, instance):
     )
 
 
-@pytest.mark.parametrize("exception_class", [
-    requests.exceptions.ConnectionError,
-    requests.exceptions.Timeout
-])
+@pytest.mark.parametrize("exception_class", [requests.exceptions.ConnectionError, requests.exceptions.Timeout])
 def test_service_check_can_connect_failure(aggregator, instance, exception_class):
     check = DruidCheck('druid', {}, [instance])
 

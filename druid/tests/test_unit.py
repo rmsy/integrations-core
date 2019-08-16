@@ -3,15 +3,12 @@
 # Licensed under Simplified BSD License (see LICENSE)
 import mock
 import pytest
+import requests
 
 from datadog_checks.base import AgentCheck, ConfigurationError
 from datadog_checks.druid import DruidCheck
 
 pytestmark = pytest.mark.unit
-
-
-class FooException(Exception):
-    pass
 
 
 def test_missing_url_config(aggregator):
@@ -39,14 +36,19 @@ def test_service_check_can_connect_success(aggregator, instance):
     )
 
 
-def test_service_check_can_connect_failure(aggregator, instance):
+@pytest.mark.parametrize("exception_class", [
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout
+])
+def test_service_check_can_connect_failure(aggregator, instance, exception_class):
     check = DruidCheck('druid', {}, [instance])
 
     with mock.patch('datadog_checks.base.utils.http.requests') as req:
-        attrs = {'raise_for_status.side_effect': FooException()}
+        attrs = {'raise_for_status.side_effect': exception_class}
         req.get.side_effect = [mock.MagicMock(status_code=500, **attrs)]
-        with pytest.raises(FooException):
-            check._get_process_properties('http://hello-world.com:8899', ['foo:bar'])
+
+        properties = check._get_process_properties('http://hello-world.com:8899', ['foo:bar'])
+        assert properties is None
 
     aggregator.assert_service_check(
         'druid.process.can_connect',

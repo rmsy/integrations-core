@@ -6,7 +6,7 @@
   "metric_prefix": "druid.",
   "metric_to_check": "",
   "creates_events": false,
-  "short_description": "",
+  "short_description": "Track metrics related to queries, ingestion, and coordination.",
   "guid": "8abd92f8-7383-45f2-a412-d6ee960baa15",
   "support": "core",
   "supported_os": [

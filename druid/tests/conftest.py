@@ -15,9 +15,6 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 @pytest.fixture(scope='session')
 def dd_environment(instance):
-    """
-    Start a standalone postgres server requiring authentication.
-    """
     with docker_run(
         os.path.join(HERE, 'compose', 'docker-compose.yaml'),
         conditions=[

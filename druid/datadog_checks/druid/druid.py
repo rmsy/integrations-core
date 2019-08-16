@@ -5,9 +5,6 @@ import requests
 
 from datadog_checks.base import AgentCheck, ConfigurationError
 
-SERVICE_CHECK_PROCESS_CAN_CONNECT = 'druid.process.can_connect'
-SERVICE_CHECK_PROCESS_STATUS = 'druid.process.health'
-
 
 class DruidCheck(AgentCheck):
     def check(self, instance):
@@ -24,9 +21,9 @@ class DruidCheck(AgentCheck):
 
         self._submit_status_service_check(base_url, tags)
 
-    def _submit_status_service_check(self, base_url, tags):
+    def _submit_status_service_check(self, base_url, base_tags):
         url = base_url + "/status/health"
-        service_check_tags = ['url:{}'.format(url)] + tags
+        tags = ['url:{}'.format(url)] + base_tags
 
         resp = self._make_request(url)
 
@@ -35,7 +32,8 @@ class DruidCheck(AgentCheck):
         else:
             status = AgentCheck.CRITICAL
 
-        self.service_check(SERVICE_CHECK_PROCESS_STATUS, status, tags=service_check_tags)
+        self.service_check('druid.process.health', status, tags=tags)
+        self.gauge('druid.process.health', 1 if resp is True else 0, tags=tags)
 
     def _get_process_properties(self, base_url, tags):
         url = base_url + "/status/properties"
@@ -48,7 +46,7 @@ class DruidCheck(AgentCheck):
         else:
             status = AgentCheck.OK
 
-        self.service_check(SERVICE_CHECK_PROCESS_CAN_CONNECT, status, tags=service_check_tags)
+        self.service_check('druid.process.can_connect', status, tags=service_check_tags)
         return resp
 
     def _make_request(self, url):

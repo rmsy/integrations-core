@@ -38,7 +38,7 @@ def check():
 
 @pytest.fixture
 def pg_instance():
-    return {'process_url': 'http://localhost:8082', 'tags': ['foo:bar']}
+    return {'host': HOST, 'port': PORT, 'username': USER, 'password': PASSWORD, 'dbname': DB_NAME, 'tags': ['foo:bar']}
 
 
 @pytest.fixture(scope='session')

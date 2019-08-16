@@ -30,7 +30,7 @@ def test_service_check_can_connect_success(aggregator, instance):
         assert resp == {'abc': '123'}
 
     aggregator.assert_service_check(
-        'druid.process.can_connect',
+        'druid.service.can_connect',
         AgentCheck.OK,
         tags=['url:http://hello-world.com:8899/status/properties', 'foo:bar'],
     )
@@ -48,7 +48,7 @@ def test_service_check_can_connect_failure(aggregator, instance, exception_class
         assert properties is None
 
     aggregator.assert_service_check(
-        'druid.process.can_connect',
+        'druid.service.can_connect',
         AgentCheck.CRITICAL,
         tags=['url:http://hello-world.com:8899/status/properties', 'foo:bar'],
     )
@@ -62,5 +62,5 @@ def test_submit_status_service_check(aggregator, instance):
     check._submit_status_service_check('http://hello-world.com:8899', ['foo:bar'])
 
     aggregator.assert_service_check(
-        'druid.process.health', AgentCheck.CRITICAL, tags=['url:http://hello-world.com:8899/status/health', 'foo:bar']
+        'druid.service.health', AgentCheck.CRITICAL, tags=['url:http://hello-world.com:8899/status/health', 'foo:bar']
     )

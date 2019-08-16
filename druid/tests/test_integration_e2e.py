@@ -37,13 +37,13 @@ def test_service_checks_e2e(dd_agent_check):
 
 def assert_service_checks(aggregator):
     aggregator.assert_service_check(
-        'druid.process.can_connect',
+        'druid.service.can_connect',
         AgentCheck.OK,
         tags=['url:http://localhost:8081/status/properties', 'my:coordinator-instance-tag'],
         count=3,
     )
     aggregator.assert_service_check(
-        'druid.process.can_connect',
+        'druid.service.can_connect',
         AgentCheck.OK,
         tags=['url:http://localhost:8082/status/properties', 'my:broker-instance-tag'],
         count=3,
@@ -51,20 +51,20 @@ def assert_service_checks(aggregator):
 
     coordinator_tags = ['url:http://localhost:8081/status/health', 'my:coordinator-instance-tag', 'service:druid/coordinator']
     aggregator.assert_service_check(
-        'druid.process.health',
+        'druid.service.health',
         AgentCheck.OK,
         tags=coordinator_tags,
         count=3,
     )
-    aggregator.assert_metric('druid.process.health', value=1, count=3, tags=coordinator_tags)
+    aggregator.assert_metric('druid.service.health', value=1, count=3, tags=coordinator_tags)
 
     broker_tags = ['url:http://localhost:8082/status/health', 'my:broker-instance-tag', 'service:druid/broker']
     aggregator.assert_service_check(
-        'druid.process.health',
+        'druid.service.health',
         AgentCheck.OK,
         tags=broker_tags,
         count=3,
     )
-    aggregator.assert_metric('druid.process.health', value=1, count=3, tags=broker_tags)
+    aggregator.assert_metric('druid.service.health', value=1, count=3, tags=broker_tags)
 
     aggregator.assert_all_metrics_covered()

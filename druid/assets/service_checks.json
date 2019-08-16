@@ -2,19 +2,19 @@
   {
       "agent_version": "6.14.0",
       "integration":"druid",
-      "check": "druid.process.can_connect",
+      "check": "druid.service.can_connect",
       "statuses": ["ok", "critical"],
       "groups": ["endpoint"],
       "name": "Druid can connect",
-      "description": "Returns `CRITICAL` if the check cannot connect to Druid process. Returns `OK` otherwise."
+      "description": "Returns `CRITICAL` if the check cannot connect to Druid service. Returns `OK` otherwise."
   },
   {
       "agent_version": "6.14.0",
       "integration":"druid",
-      "check": "druid.process.health",
+      "check": "druid.service.health",
       "statuses": ["ok", "critical"],
       "groups": ["endpoint"],
       "name": "Druid health",
-      "description": "Returns `CRITICAL` if Druid process is not healthy. Returns `OK` otherwise."
+      "description": "Returns `CRITICAL` if Druid service is not healthy. Returns `OK` otherwise."
   }
 ]

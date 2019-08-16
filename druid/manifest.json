@@ -4,7 +4,7 @@
   "manifest_version": "1.0.0",
   "name": "druid",
   "metric_prefix": "druid.",
-  "metric_to_check": "druid.process.health",
+  "metric_to_check": "druid.service.health",
   "creates_events": false,
   "short_description": "Track metrics related to queries, ingestion, and coordination.",
   "guid": "8abd92f8-7383-45f2-a412-d6ee960baa15",

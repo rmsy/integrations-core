@@ -140,6 +140,20 @@ def test_check_adoprovider(aggregator, init_config, instance_sql2017, adoprovide
     _assert_metrics(aggregator, expected_tags)
 
 
+@pytest.mark.e2e
+def test_check_docker_e2e(dd_agent_check, init_config, instance_docker):
+    aggregator = dd_agent_check({'init_config': init_config, 'instances': [instance_docker]}, rate=True)
+
+    aggregator.assert_metric_has_tag('sqlserver.db.commit_table_entries', 'db:master')
+
+    for mname in EXPECTED_METRICS:
+        aggregator.assert_metric(mname)
+
+    aggregator.assert_service_check('sqlserver.can_connect', status=SQLServer.OK)
+
+    aggregator.assert_all_metrics_covered()
+
+
 def _assert_metrics(aggregator, expected_tags):
     """
     Boilerplate asserting all the expected metrics and service checks.
